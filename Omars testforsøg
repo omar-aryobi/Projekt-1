@@ -9,14 +9,36 @@ Created on Thu Oct 28 13:32:44 2021
 import numpy as np
 
 def dataLoad(filename):
-    data = np.empty([0,3])
-    print(data)
+    data = np.empty((0,3))
+    #print(data)
     with open(filename, mode = 'r') as f:
         fl = f.readlines()
-        for i in fl:
-            print(i.split())
-    
-    return None
+    for i in fl:
+        data = np.append(data, np.array([i.split()],dtype=float), axis = 0)
+        #print(data)
+        
+    l = []
+    for k in range(len(data)):
+        if 10 < data[k][0] < 60 and data[k][1] > 0 and int(data[k][2]) in [1,2,3,4]:
+            pass
+        else:
+            l.append(k)
+            #Error message
+            if not 10 < data[k][0] < 60:
+                    error = 'temperature higher or equal to 60 or lower or equal to 10'
+                    print(f"Error in line {k} because {error}.")
+            if not data[k][1] > 0:
+                    error = 'growth rate is negative'
+                    print(f"Error in line {k} because {error}.")
+            if not int(data[k][2]) in [1,2,3,4]:
+                    error = 'bacteria number is not on the list'
+                    print(f"Error in line {k} because {error}.")
+            
+            
+    data = np.delete(data, l, 0)
+            
+    return data
 
 print(dataLoad('test.txt'))
+#dataLoad('test.txt')
 
