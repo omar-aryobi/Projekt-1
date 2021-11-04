@@ -8,6 +8,7 @@ Created on Thu Oct 28 13:32:44 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 def dataLoad(filename):
     data = np.empty((0,3))
@@ -38,6 +39,12 @@ def dataLoad(filename):
             
     data = np.delete(data, l, 0)
             
+    #np array med true hele vejen også sætte den lig false hver gang en af dem ikke er opfyldt. 
+    #Kun 3 if-statements
+
+
+
+
     return data
 
 #ER vores data i et array?
@@ -70,7 +77,6 @@ def dataStatistics(data, statistic):
 
     elif statistic == "Mean Hot Growth rate":
         new_data = data[data[:,0]>50,:]
-        print(new_data)
         result = np.mean(new_data,axis=0)[1]
     
     return result
@@ -94,11 +100,24 @@ print(dataStatistics(a, "Std Temperature"))
     
     
 def dataPlot(data):
-    #Opdeler data kan bruges i begge plot
+    #Opdeler data kan bruges i begge plot (laver for-loop)
     data1 = data[data[:,2] == 1,:]
     data2 = data[data[:,2] == 2,:]
     data3 = data[data[:,2] == 3,:]
     data4 = data[data[:,2] == 4,:]
+    
+    sorted_order = np.argsort(data1[:,0])
+    data1 = data1[sorted_order]
+    
+    sorted_order = np.argsort(data2[:,0])
+    data2 = data2[sorted_order]
+    
+    sorted_order = np.argsort(data3[:,0])
+    data3 = data3[sorted_order]
+    
+    sorted_order = np.argsort(data4[:,0])
+    data4 = data4[sorted_order]
+
     
     #Plot 1: Number of bacteria
     count_1=data1.shape[0]
@@ -115,7 +134,8 @@ def dataPlot(data):
     y = [count_1,count_2,count_3,count_4]
     fig = plt.figure()
     ax = fig.add_axes([0,0,1,1])
-    ax.bar(labels,y)
+
+    ax.bar(labels,y, color = ["orchid","indigo","pink", "lightcoral"])
     
     plt.title("Number of bacteria")
     #idk med dem her plt.xlabel("Type of bacteria") 
@@ -123,7 +143,80 @@ def dataPlot(data):
     plt.show()
     
     #Plot 2: Growth rate by temperature
-    data[data[:,2] == 1,:]
+    #plt.plot([data1[:,0], data2[:,0], data3[:,0], data4[:,0]],[data1[:,1], data2[:,1], data3[:,1], data4[:,1]], color = [".-b", ".-r", ".-y", ".-black"])
+    plt.plot(data1[:,0],data1[:,1],color='orchid', linestyle='solid', marker='.', label = "Salmonella enterica")
+    plt.plot(data2[:,0],data2[:,1],color='indigo', linestyle='solid', marker='.', label = "Bacillus cereus")
+    plt.plot(data3[:,0],data3[:,1],color='pink', linestyle='solid', marker='.', label = "Listeria")
+    plt.plot(data4[:,0],data4[:,1],color='lightcoral', linestyle='solid', marker='.', label = "Brochothrix thermosphacta'")
+    
+    plt.xlim([10, 60]) 
+    plt.ylim([0, 1])
+    
+    plt.xlabel("Temperature")
+    plt.ylabel("Growth Rate")
+    
+    plt.title("Growth rate by temperature")
+    
+    #Måske gøre legends mindre
+    plt.legend(prop={'size': 7})
+    plt.show()
 
 print(dataPlot(data1))
+
+def inputNumber(prompt):
+    while True:
+        try:
+            num = float(input(prompt))
+            break
+        except ValueError:
+            print("Please enter a number")
+            pass
+    return num
+
+def displayMenu(options):
+    # DISPLAYMENU Displays a menu of options, ask the user to choose an item
+    # and returns the number of the menu item chosen.
+    ##
+    #Usage: choice = displayMenu(options)
+    ##
+    #Input options Menu options (array of strings)
+    # Output choice Chosen option (integer)
+    ##
+    #Author: Mikkel N. Schmidt, mnsc@dtu.dk, 2015
+    # Display menu options
+    for i in range(len(options)):
+        print("{:d}. {:s}".format(i+1, options[i]))
     
+    # Get a valid menu choice
+    choice = 0
+
+    while not(np.any(choice == np.arange(len(options))+1)):
+        #Fejlmeddelelse (if-statements)
+        
+        choice = inputNumber("Please choose a menu item: ")
+        
+    return choice
+
+
+#Hoved-scriptet
+#rækkefølgen skal være underordnet
+#print(inputNumber('Vælg et nummer'))
+
+choice = displayMenu(["Load data", "Filter data", "Display statistics", "Generate plots","Quit"])
+
+
+if choice == 1:
+    file_name = input("Please enter file name to load data: ")
+    file_exists = os.path.exists(file_name)
+    while not file_exists:
+        file_name = input("File not found. Please enter a valid file name: ")
+        file_exists = os.path.exists(file_name)
+    data = dataLoad(file_name)
+    print("Data loaded")
+
+    
+
+
+
+
+
