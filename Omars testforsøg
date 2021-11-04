@@ -7,6 +7,7 @@ Created on Thu Oct 28 13:32:44 2021
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 def dataLoad(filename):
     data = np.empty((0,3))
@@ -39,6 +40,90 @@ def dataLoad(filename):
             
     return data
 
-print(dataLoad('test.txt'))
-#dataLoad('test.txt')
+#ER vores data i et array?
 
+print(dataLoad('test.txt'))
+data1 = dataLoad('test.txt')
+
+
+def dataStatistics(data, statistic):
+    
+    if statistic == "Mean Temperature":
+        result = np.mean(data,axis=0)[0]
+        
+    elif statistic == "Mean Growth rate":
+        result = np.mean(data,axis=0)[1]
+        
+    elif statistic == "Std Temperature":
+        result = np.std(data, axis=0)[0]
+        
+    elif statistic == "Std Growth rate":
+        result = np.std(data, axis=0)[1]
+    
+    elif statistic == "Rows":
+        result = data.shape[0]
+        
+    elif statistic == "Mean Cold Growth rate":
+        #En linje (man kan også lave for-loop)
+        new_data = data[data[:,0]<20,:]
+        result = np.mean(new_data,axis=0)[1]
+
+    elif statistic == "Mean Hot Growth rate":
+        new_data = data[data[:,0]>50,:]
+        print(new_data)
+        result = np.mean(new_data,axis=0)[1]
+    
+    return result
+    
+print(dataStatistics(data1, "Mean Temperature"))
+    
+print(dataStatistics(data1, "Mean Growth rate"))
+    
+print(dataStatistics(data1, "Std Temperature")) 
+
+print(dataStatistics(data1, "Std Growth rate")) 
+
+print(dataStatistics(data1, "Rows")) 
+
+print(dataStatistics(data1, "Mean Cold Growth rate")) 
+
+print(dataStatistics(data1, "Mean Hot Growth rate")) 
+
+a = np.array([[1,2,3],[4,5,6]])
+print(dataStatistics(a, "Std Temperature")) 
+    
+    
+def dataPlot(data):
+    #Opdeler data kan bruges i begge plot
+    data1 = data[data[:,2] == 1,:]
+    data2 = data[data[:,2] == 2,:]
+    data3 = data[data[:,2] == 3,:]
+    data4 = data[data[:,2] == 4,:]
+    
+    #Plot 1: Number of bacteria
+    count_1=data1.shape[0]
+    count_2=data2.shape[0]
+    count_3=data3.shape[0]
+    count_4=data4.shape[0]
+    #count_1 = np.count_nonzero(data[:,2] == 1)
+    #count_2 = np.count_nonzero(data[:,2] == 2)
+    #ount_3 = np.count_nonzero(data[:,2] == 3)
+    #count_4 = np.count_nonzero(data[:,2] == 4)
+    
+    labels = ['Salmonella enterica', 'Bacillus cereus', 'Listeria', 'Brochothrix thermosphacta']
+    #tror jeg ikke behøves x = np.arange(len(labels)) måske forskellige farver
+    y = [count_1,count_2,count_3,count_4]
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+    ax.bar(labels,y)
+    
+    plt.title("Number of bacteria")
+    #idk med dem her plt.xlabel("Type of bacteria") 
+    #plt.ylabel("Number") 
+    plt.show()
+    
+    #Plot 2: Growth rate by temperature
+    data[data[:,2] == 1,:]
+
+print(dataPlot(data1))
+    
