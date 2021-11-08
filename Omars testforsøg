@@ -20,30 +20,45 @@ def dataLoad(filename):
         #print(data)
         
     l = []
-    for k in range(len(data)):
-        if 10 < data[k][0] < 60 and data[k][1] > 0 and int(data[k][2]) in [1,2,3,4]:
-            pass
-        else:
-            l.append(k)
-            #Error message
-            if not 10 < data[k][0] < 60:
-                    error = 'temperature higher or equal to 60 or lower or equal to 10'
-                    print(f"Error in line {k} because {error}.")
-            if not data[k][1] > 0:
-                    error = 'growth rate is negative'
-                    print(f"Error in line {k} because {error}.")
-            if not int(data[k][2]) in [1,2,3,4]:
-                    error = 'bacteria number is not on the list'
-                    print(f"Error in line {k} because {error}.")
+# =============================================================================
+#     for k in range(len(data)):
+#         if 10 < data[k][0] < 60 and data[k][1] > 0 and int(data[k][2]) in [1,2,3,4]:
+#             pass
+#         else:
+#             l.append(k)
+#             #Error message
+#             if not 10 < data[k][0] < 60:
+#                     error = 'temperature higher or equal to 60 or lower or equal to 10'
+#                     print(f"Error in line {k} because {error}.")
+#             if not data[k][1] > 0:
+#                     error = 'growth rate is negative'
+#                     print(f"Error in line {k} because {error}.")
+#             if not int(data[k][2]) in [1,2,3,4]:
+#                     error = 'bacteria number is not on the list'
+#                     print(f"Error in line {k} because {error}.")
+#             
+# =============================================================================
             
+    for k in range(len(data)):
+        if not 10 < data[k][0] < 60:
+            error = 'temperature higher or equal to 60 or lower or equal to 10'
+            print(f"Error in line {k} because {error}.")
+            l.append(k)
+        if not data[k][1] > 0:
+            error = 'growth rate is negative'
+            print(f"Error in line {k} because {error}.")
+            l.append(k)
+        if not int(data[k][2]) in [1,2,3,4]:
+            error = 'bacteria number is not on the list'
+            print(f"Error in line {k} because {error}.")
+            l.append(k)
+
+
             
     data = np.delete(data, l, 0)
             
     #np array med true hele vejen også sætte den lig false hver gang en af dem ikke er opfyldt. 
     #Kun 3 if-statements
-
-
-
 
     return data
 
@@ -193,7 +208,7 @@ def displayMenu(options):
     while not(np.any(choice == np.arange(len(options))+1)):
         #Fejlmeddelelse (if-statements)
         
-        choice = inputNumber("Please choose a menu item: ")
+        choice = inputNumber("Please choose a menu item by entering the number of the option: ")
         
     return choice
 
@@ -202,20 +217,106 @@ def displayMenu(options):
 #rækkefølgen skal være underordnet
 #print(inputNumber('Vælg et nummer'))
 
-choice = displayMenu(["Load data", "Filter data", "Display statistics", "Generate plots","Quit"])
-
-
-if choice == 1:
-    file_name = input("Please enter file name to load data: ")
-    file_exists = os.path.exists(file_name)
-    while not file_exists:
-        file_name = input("File not found. Please enter a valid file name: ")
-        file_exists = os.path.exists(file_name)
-    data = dataLoad(file_name)
-    print("Data loaded")
-
+while True:
+    choice = displayMenu(["Load data", "Filter data", "Display statistics", "Generate plots","Quit"])
     
-
+    
+    if choice == 1:
+        file_name = input("Please enter file name to load data: ")
+        file_exists = os.path.exists(file_name)
+        while not file_exists:
+            file_name = input("File not found. Return to menu (enter R) or enter a valid file name: ")
+    # =============================================================================
+    #         if file_name == "R":
+    #             break
+    # =============================================================================
+            file_exists = os.path.exists(file_name)
+        data = dataLoad(file_name)
+        print("Data loaded and the lines with errors are deleted.\n")
+        
+    if choice == 2:
+        #Skal måske fejl om at 1 skal vælges først eller også skal data loades.
+        print("\nFilter data based on the following categories:")
+        filter_data = displayMenu(["Type of bacteria", "Range of Growth rate", "Range of Temperature", "Return to menu"])
+        
+        if filter_data == 1:
+            print("\nFilter data based on the following types of bacteria:")
+            bacteria = displayMenu(["Salmonella enterica", "Bacillus cereus", "Listeria", "Brochothrix thermosphacta", "Return to menu"])
+            if bacteria == 5:
+                pass
+            else:
+                data = data[data[:,2] == bacteria,:]
+                print("\nThe filtered data is shown below:")
+                print(data, "\n")
+                #indexere på baggrund af bacteria da det er et tal
+                
+        if filter_data == 2:
+            #Bedre engelsk
+            min_growth = inputNumber("Please enter the minimum value of the Growth rate range: ")
+            max_growth = inputNumber("Please enter the maximum value of the Growth rate range: ")
+            
+            #data = data[((min_growth <= data[:,1]) and (data[:,1] <= max_growth)),:]
+            data1 = data[min_growth <= data[:,1],:]
+            data = data1[data1[:,1] <= max_growth,:]
+            print("\nThe filtered data is shown below:")
+            print(data, "\n")
+            
+        if filter_data == 3:
+            min_temp = inputNumber("Please enter the minimum value of the Temperature range: ")
+            max_temp = inputNumber("Please enter the maximum value of the Temperature range: ")
+            
+            data1 = data[min_temp <= data[:,0],:]
+            data = data1[data1[:,0] <= max_temp,:]
+            print("\nThe filtered data is shown below:")
+            print(data, "\n")
+            
+        if filter_data == 4:
+            pass
+        
+        
+    if choice == 3:
+        try: 
+            data
+        
+        #Nok bedre med en menu igen? men så bliver den længere
+        #Fejlbehandling af hvad de skriver
+            statistic = "Data"
+            while statistic not in ["Mean Temperature","Mean Growth rate", "Std Temperature", "Std Growth rate", "Rows", "Mean Cold Growth rate","Mean Hot Growth rate", "Return to menu"]:
+                statistic = input("""\nWhich of the following statistics would you like to display: 
+                      \n - Mean Temperature
+                      \n - Mean Growth rate
+                      \n - Std Temperature
+                      \n - Std Growth rate
+                      \n - Rows
+                      \n - Mean Cold Growth rate
+                      \n - Mean Hot Growth rate
+                      \n - Return to menu
+                      """)
+            if statistic == "Return to menu":
+                break
+            else:
+                displayed_stats = dataStatistics(data, statistic)
+                print(f"{statistic} = {displayed_stats}")
+                
+        except NameError:
+            print("\n\n!!! Please load data before displaying statistics !!! \n\n")
+            pass
+        
+    if choice == 4:
+        try: 
+            data
+            
+            dataPlot(data)
+            
+            print("\n The plots are generated based on the choosen data. \n")
+        
+        except NameError:
+            print("\n\n!!! Please load data before plotting data !!! \n\n")
+            pass
+            
+    if choice == 5:
+        print("\nThe user has choosen to quit the program. Bye!")
+        break
 
 
 
