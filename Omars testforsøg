@@ -11,34 +11,25 @@ import matplotlib.pyplot as plt
 import os
 
 def dataLoad(filename):
+    """ str -> np.array of np.arrays (Nx3)
+    
+    Returns matrix (Nx3) with the valid rows from the file. 
+    The function prints an error message which explains witch
+    line the error occured and what the error was.
+    
+    """
+    
     data = np.empty((0,3))
-    #print(data)
+    
+    #Loads data from file
     with open(filename, mode = 'r') as f:
         fl = f.readlines()
     for i in fl:
         data = np.append(data, np.array([i.split()],dtype=float), axis = 0)
-        #print(data)
         
     l = []
-# =============================================================================
-#     for k in range(len(data)):
-#         if 10 < data[k][0] < 60 and data[k][1] > 0 and int(data[k][2]) in [1,2,3,4]:
-#             pass
-#         else:
-#             l.append(k)
-#             #Error message
-#             if not 10 < data[k][0] < 60:
-#                     error = 'temperature higher or equal to 60 or lower or equal to 10'
-#                     print(f"Error in line {k} because {error}.")
-#             if not data[k][1] > 0:
-#                     error = 'growth rate is negative'
-#                     print(f"Error in line {k} because {error}.")
-#             if not int(data[k][2]) in [1,2,3,4]:
-#                     error = 'bacteria number is not on the list'
-#                     print(f"Error in line {k} because {error}.")
-#             
-# =============================================================================
-            
+    
+    #Check if row is invalid
     for k in range(len(data)):
         if not 10 < data[k][0] < 60:
             error = 'temperature higher or equal to 60 or lower or equal to 10'
@@ -53,23 +44,30 @@ def dataLoad(filename):
             print(f"Error in line {k} because {error}.")
             l.append(k)
 
-
-            
     data = np.delete(data, l, 0)
-            
-    #np array med true hele vejen også sætte den lig false hver gang en af dem ikke er opfyldt. 
-    #Kun 3 if-statements
 
     return data
 
-#ER vores data i et array?
 
 print(dataLoad('test.txt'))
 data1 = dataLoad('test.txt')
 
 
 def dataStatistics(data, statistic):
-    
+    """
+    Parameters
+    ----------
+    data : string
+        Data in matrix (Nx3).
+    statistic : string
+        Choose one of the statistics seen below.
+
+    Returns
+    -------
+    result : number (float/int)
+        The calculated statistic.
+
+    """
     if statistic == "Mean Temperature":
         result = np.mean(data,axis=0)[0]
         
@@ -296,7 +294,7 @@ while True:
                 break
             else:
                 displayed_stats = dataStatistics(data, statistic)
-                print(f"{statistic} = {displayed_stats}")
+                print(f"{statistic} = {displayed_stats}\n")
                 
         except NameError:
             print("\n\n!!! Please load data before displaying statistics !!! \n\n")
